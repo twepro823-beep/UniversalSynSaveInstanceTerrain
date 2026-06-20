@@ -1097,7 +1097,6 @@ do
 					Category = "Primitive",
 					ValueType = "BinaryString",
 					Special = true,
-					CanRead = false,
 					Fallback = function(instance)
 						if gethiddenproperty then
 							return gethiddenproperty(instance, terrainPropertyName)
