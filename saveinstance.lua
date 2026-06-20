@@ -1077,6 +1077,37 @@ do
 		},
 	}, true)
 
+	local function addTerrainGridProperties(classList)
+		local Terrain = classList.Terrain
+		if not Terrain then
+			return
+		end
+
+		local Properties = Terrain.Properties
+		local ExistingProperties = {}
+		for _, property in next, Properties do
+			ExistingProperties[property.Name] = true
+		end
+
+		for _, propertyName in next, { "SmoothGrid", "PhysicsGrid" } do
+			if not ExistingProperties[propertyName] then
+				local terrainPropertyName = propertyName
+				Properties[#Properties + 1] = {
+					Name = terrainPropertyName,
+					Category = "Primitive",
+					ValueType = "BinaryString",
+					Special = true,
+					CanRead = false,
+					Fallback = function(instance)
+						if gethiddenproperty then
+							return gethiddenproperty(instance, terrainPropertyName)
+						end
+					end,
+				}
+			end
+		end
+	end
+
 	local function AttributesSerialize(attrs)
 		-- * There are certain restrictions for names of attributes
 		-- https://create.roblox.com/docs/reference/engine/classes/Instance#SetAttribute
@@ -2108,6 +2139,8 @@ do
 
 			classList[ClassName] = Class
 		end
+
+		addTerrainGridProperties(classList)
 
 		return classList
 	end
