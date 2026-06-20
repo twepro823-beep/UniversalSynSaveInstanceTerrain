@@ -1115,6 +1115,14 @@ do
 		},
 	}, true)
 
+	local TERRAIN_GRID_PROPERTIES = { "SmoothGrid", "PhysicsGrid" }
+
+	local function readTerrainGridProperty(instance, propertyName)
+		if gethiddenproperty then
+			return gethiddenproperty(instance, propertyName)
+		end
+	end
+
 	local function addTerrainGridProperties(classList)
 		local Terrain = classList.Terrain
 		if not Terrain then
@@ -1127,7 +1135,7 @@ do
 			ExistingProperties[property.Name] = true
 		end
 
-		for _, propertyName in { "SmoothGrid", "PhysicsGrid" } do
+		for _, propertyName in TERRAIN_GRID_PROPERTIES do
 			if not ExistingProperties[propertyName] then
 				local terrainPropertyName = propertyName
 				Properties[#Properties + 1] = {
@@ -1136,9 +1144,7 @@ do
 					ValueType = "BinaryString",
 					Special = true,
 					Fallback = function(instance)
-						if gethiddenproperty then
-							return gethiddenproperty(instance, terrainPropertyName)
-						end
+						return readTerrainGridProperty(instance, terrainPropertyName)
 					end,
 				}
 			end
@@ -1636,6 +1642,12 @@ do
 
 		Terrain = {
 			AcquisitionMethod = "LastUsedModificationMethod", -- ? Not sure, RobloxScriptSecurity
+			SmoothGrid = function(instance)
+				return readTerrainGridProperty(instance, "SmoothGrid")
+			end,
+			PhysicsGrid = function(instance)
+				return readTerrainGridProperty(instance, "PhysicsGrid")
+			end,
 			-- Material = function(instance) -- EnableMaterialSlotTable FFlag, uncomment once GetMaterialSlot is enabled
 			-- 	local slots = {}
 			-- 	for slotIndex = 2, 1e9 do
